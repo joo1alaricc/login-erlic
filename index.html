@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Akun</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #1e3c72, #2a5298, #4a90e2);
+        }
+
+        h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1e3c72;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            color: #1e3c72;
+            font-size: 20px;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(30, 60, 114, 0.2);
+            border-top: 4px solid #1e3c72;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .step.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .step.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .step-line {
+            height: 2px;
+            background: #ddd;
+            flex: 1;
+            align-self: center;
+            margin: 0 5px;
+        }
+
+        .back-btn {
+            background: transparent;
+            color: #1e3c72;
+            border: none;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-shield-alt"></i> Verifikasi Akun</h1>
+        <p class="subtitle">Silahkan masukkan data Anda untuk melanjutkan</p>
+        
+        <div class="step-indicator">
+            <div class="step active">1</div>
+            <div class="step-line"></div>
+            <div class="step">2</div>
+            <div class="step-line"></div>
+            <div class="step">3</div>
+        </div>
+
+        <!-- Step 1: Nomor Telepon -->
+        <div class="form-step active" id="step1">
+            <div class="input-group">
+                <label for="phone"><i class="fas fa-phone"></i> Nomor Telepon</label>
+                <input type="tel" id="phone" placeholder="Contoh: 6282245682288">
+                <div class="error-message" id="phone-error">Nomor telepon tidak valid</div>
+            </div>
+            <button class="btn" onclick="validatePhone()">
+                <i class="fas fa-arrow-right"></i> Lanjutkan
+            </button>
+        </div>
+
+        <!-- Step 2: Username -->
+        <div class="form-step" id="step2">
+            <div class="input-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" placeholder="Masukkan username Anda">
+                <div class="error-message" id="username-error">Username tidak valid</div>
+            </div>
+            <button class="btn" onclick="validateUsername()">
+                <i class="fas fa-arrow-right"></i> Lanjutkan
+            </button>
+            <button class="back-btn" onclick="showStep(1)">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+        </div>
+
+        <!-- Step 3: Password -->
+        <div class="form-step" id="step3">
+            <div class="input-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" placeholder="Masukkan password Anda">
+                <div class="error-message" id="password-error">Password tidak valid</div>
+            </div>
+            <button class="btn" onclick="validatePassword()">
+                <i class="fas fa-check"></i> Verifikasi
+            </button>
+            <button class="back-btn" onclick="showStep(2)">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+        </div>
+
+        <!-- Success Message -->
+        <div class="form-step" id="step4">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="success-message">
+                <i class="fas fa-save"></i> Data sudah di simpan. Silahkan hubungkan bot di panel Pterodactyl.
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px; color: #1e3c72;">Memproses data...</p>
+        </div>
+    </div>
+
+    <script>
+        // CONFIG.JS - Konfigurasi Aplikasi
+        const CONFIG = {
+            // GitHub API Configuration
+            githubToken: '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',
+            repoOwner: 'joo1alaricc',
+            repoName: 'dimasnathan',
+            erlicFile: 'erlic.json',
+            statusFile: 'status.json',
+            
+            // Media Configuration
+            audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+            imageUrl: '' // Background image URL (optional)
+        };
+
+        // Global variables
+        let userData = {
+            nomor: '',
+            username: '',
+            password: ''
+        };
+
+        let githubData = null;
+
+        // Audio element
+        let audio = new Audio();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Play audio
+            playAudio();
+        });
+
+        function playAudio() {
+            try {
+                audio.src = CONFIG.audioUrl;
+                audio.play().catch(e => console.log('Autoplay prevented'));
+            } catch(e) {
+                console.log('Audio playback failed');
+            }
+        }
+
+        // Navigation functions
+        function showStep(step) {
+            // Hide all steps
+            const steps = document.querySelectorAll('.form-step');
+            steps.forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show current step
+            const targetStep = document.getElementById(`step${step}`);
+            if (targetStep) {
+                targetStep.classList.add('active');
+            }
+            
+            updateStepIndicator(step);
+        }
+
+        function updateStepIndicator(currentStep) {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((el, index) => {
+                el.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    el.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        // Validation functions
+        async function validatePhone() {
+            const phone = document.getElementById('phone').value.trim();
+            const errorElement = document.getElementById('phone-error');
+            
+            if (!phone) {
+                showError(errorElement, 'Nomor telepon tidak boleh kosong');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Load data if not already loaded
+                if (!githubData) {
+                    await loadGithubData();
+                }
+                
+                if (!githubData) {
+                    throw new Error('Failed to load data from GitHub');
+                }
+                
+                // Search for phone number
+                const foundItem = githubData.find(item => {
+                    const itemNomor = String(item.nomor).trim();
+                    const searchNomor = String(phone).trim();
+                    return itemNomor === searchNomor;
+                });
+                
+                if (foundItem) {
+                    userData.nomor = phone;
+                    showLoading(false);
+                    showStep(2);
+                } else {
+                    showLoading(false);
+                    showError(errorElement, 'Nomor telepon tidak terdaftar');
+                }
+            } catch (error) {
+                showLoading(false);
+                showError(errorElement, 'Terjadi kesalahan saat memverifikasi');
+            }
+        }
+
+        async function validateUsername() {
+            const username = document.getElementById('username').value.trim();
+            const errorElement = document.getElementById('username-error');
+            
+            if (!username) {
+                showError(errorElement, 'Username tidak boleh kosong');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                if (!githubData) {
+                    await loadGithubData();
+                }
+                
+                const foundItem = githubData.find(item => {
+                    const itemUsername = String(item.username).trim();
+                    const itemNomor = String(item.nomor).trim();
+                    const searchUsername = String(username).trim();
+                    const searchNomor = String(userData.nomor).trim();
+                    
+                    const match = itemUsername === searchUsername && itemNomor === searchNomor;
+                    return match;
+                });
+                
+                if (foundItem) {
+                    userData.username = username;
+                    showLoading(false);
+                    showStep(3);
+                } else {
+                    showLoading(false);
+                    showError(errorElement, 'Username tidak valid untuk nomor ini');
+                }
+            } catch (error) {
+                showLoading(false);
+                showError(errorElement, 'Terjadi kesalahan saat memverifikasi');
+            }
+        }
+
+        async function validatePassword() {
+            const password = document.getElementById('password').value.trim();
+            const errorElement = document.getElementById('password-error');
+            
+            if (!password) {
+                showError(errorElement, 'Password tidak boleh kosong');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                if (!githubData) {
+                    await loadGithubData();
+                }
+                
+                const foundItem = githubData.find(item => {
+                    const itemPassword = String(item.password).trim();
+                    const itemUsername = String(item.username).trim();
+                    const itemNomor = String(item.nomor).trim();
+                    const searchPassword = String(password).trim();
+                    const searchUsername = String(userData.username).trim();
+                    const searchNomor = String(userData.nomor).trim();
+                    
+                    const match = itemPassword === searchPassword && 
+                                 itemUsername === searchUsername && 
+                                 itemNomor === searchNomor;
+                    
+                    return match;
+                });
+                
+                if (foundItem) {
+                    userData.password = password;
+                    // Simpan status ke GitHub
+                    await saveStatusToGithub();
+                    showLoading(false);
+                    showStep(4); // Success step
+                } else {
+                    showLoading(false);
+                    showError(errorElement, 'Password tidak valid untuk username ini');
+                }
+            } catch (error) {
+                showLoading(false);
+                showError(errorElement, 'Terjadi kesalahan saat memverifikasi');
+            }
+        }
+
+        // GitHub functions
+        async function loadGithubData() {
+            try {
+                const url = `https://raw.githubusercontent.com/${CONFIG.repoOwner}/${CONFIG.repoName}/main/${CONFIG.erlicFile}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const textData = await response.text();
+                githubData = JSON.parse(textData);
+            } catch (error) {
+                console.error('Error loading GitHub ', error);
+                githubData = null;
+            }
+        }
+
+        async function saveStatusToGithub() {
+            try {
+                const url = `https://raw.githubusercontent.com/${CONFIG.repoOwner}/${CONFIG.repoName}/main/${CONFIG.statusFile}`;
+                
+                // First, get the current status file
+                let statusData = [];
+                try {
+                    const statusResponse = await fetch(url);
+                    if (statusResponse.ok) {
+                        statusData = await statusResponse.json();
+                    }
+                } catch (error) {
+                    // File not found, create new array
+                }
+                
+                // Add new entry
+                const newEntry = {
+                    nomor: userData.nomor,
+                    status: true
+                };
+                
+                statusData.push(newEntry);
+                
+                // Save to GitHub (in production, you would implement GitHub API calls here)
+                console.log('Status would be saved:', statusData);
+                
+            } catch (error) {
+                // Non-fatal error - don't interrupt the user flow
+                console.error('Error saving status (non-fatal):', error);
+            }
+        }
+
+        // Helper functions
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            const loadingElement = document.getElementById('loading');
+            loadingElement.style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
